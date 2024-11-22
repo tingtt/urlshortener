@@ -160,43 +160,45 @@ func listHTML(redirects []redirect) gomponents.Node {
 		}
 	}
 
-	return html.Form(gomponents.Attr("method", "POST"),
-		html.Button(gomponents.Attr("type", "submit"),
-			gomponents.Text("Delete selected"),
-		),
-		html.Table(
-			html.THead(
-				html.Tr(
-					html.Td(),
-					html.Td(gomponents.Text("From")),
-					html.Td(gomponents.Text("To")),
+	return gomponents.Group{
+		html.H2(gomponents.Text("Redirects")),
+		html.Form(gomponents.Attr("method", "POST"),
+			html.Button(gomponents.Attr("type", "submit"),
+				gomponents.Text("Delete selected"),
+			),
+			html.Table(
+				html.THead(
+					html.Tr(
+						html.Td(),
+						html.Td(gomponents.Text("From")),
+						html.Td(gomponents.Text("To")),
+					),
 				),
-			),
-			html.TBody(
-				gomponents.Map(redirects, func(redirect redirect) gomponents.Node {
-					return html.Tr(
-						html.Td(
-							html.Input(
-								gomponents.Attr("type", "checkbox"),
-								gomponents.Attr("name", "delete"),
-								gomponents.Attr("value", redirect.from),
+				html.TBody(
+					gomponents.Map(redirects, func(redirect redirect) gomponents.Node {
+						return html.Tr(
+							html.Td(
+								html.Input(
+									gomponents.Attr("type", "checkbox"),
+									gomponents.Attr("name", "delete"),
+									gomponents.Attr("value", redirect.from),
+								),
 							),
-						),
-						html.Td(
-							html.A(gomponents.Attr("href", redirect.from), html.Class("pr"),
-								gomponents.Text(redirect.from),
+							html.Td(
+								html.A(gomponents.Attr("href", redirect.from), html.Class("pr"),
+									gomponents.Text(redirect.from),
+								),
 							),
-						),
-						html.Td(
-							html.A(gomponents.Attr("href", redirect.to), gomponents.Attr("tabindex", "-1"),
-								gomponents.Text(redirect.to),
+							html.Td(
+								html.A(gomponents.Attr("href", redirect.to), gomponents.Attr("tabindex", "-1"),
+									gomponents.Text(redirect.to),
+								),
 							),
-						),
-					)
-				}),
-			),
-			html.StyleEl(
-				gomponents.Text(`
+						)
+					}),
+				),
+				html.StyleEl(
+					gomponents.Text(`
 					.pr {
 						padding-right: 16px;
 					}
@@ -204,7 +206,8 @@ func listHTML(redirects []redirect) gomponents.Node {
 						font-weight: bold;
 					}
 				`),
+				),
 			),
 		),
-	)
+	}
 }
