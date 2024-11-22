@@ -1,0 +1,9 @@
+Makefile
+CONTRIBUTING.md
+README.md
+.docs/
+.data/
+test/
+
+.git/
+.gitignore

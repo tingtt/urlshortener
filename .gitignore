@@ -1,0 +1,10 @@
+# out
+urlshortener
+
+# data
+.data/
+
+# ci
+.tools/
+cover.out
+cover.html
