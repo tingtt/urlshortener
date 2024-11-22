@@ -38,6 +38,12 @@ func (r *registry) FindAll() (map[string]string, error) {
 	return r.data, nil
 }
 
+// Remove implements Registry.
+func (r *registry) Remove(path string) error {
+	delete(r.data, path)
+	return nil
+}
+
 // SavePersistently implements Registry.
 func (r *registry) SavePersistently() error {
 	err := os.MkdirAll(path.Dir(r.persistentDataFilePath), 0755)

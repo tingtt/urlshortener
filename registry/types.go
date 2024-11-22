@@ -8,6 +8,7 @@ type Registry interface {
 	Append(path string, redirectTarget string) error
 	Find(path string) (redirectTarget string, err error)
 	FindAll() (map[string]string, error)
+	Remove(path string) error
 	SavePersistently() error
 	loadToCache() error
 }
