@@ -8,22 +8,25 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"urlshortener/registry"
+	uiprovider "urlshortener/ui/provider"
+	"urlshortener/usecase"
 )
 
 type Dependencies struct {
-	Registry registry.Registry
+	Usecase usecase.Handler
+	UI      uiprovider.Provider
 }
 
 func (deps *Dependencies) validate() {
-	if deps.Registry == nil {
-		panic("registry is nil")
+	if deps.Usecase == nil {
+		panic("handler is nil")
+	}
+	if deps.UI == nil {
+		panic("UI provider is nil")
 	}
 }
 
 func Serve(port uint16, deps Dependencies, shutdownCtx context.Context, wg *sync.WaitGroup) error {
-	deps.validate()
-
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: newHandler(deps),

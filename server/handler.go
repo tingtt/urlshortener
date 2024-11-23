@@ -11,6 +11,8 @@ type handler struct {
 }
 
 func newHandler(deps Dependencies) http.Handler {
+	deps.validate()
+
 	h := handler{deps}
 
 	r := chi.NewRouter()
@@ -20,6 +22,8 @@ func newHandler(deps Dependencies) http.Handler {
 	return r
 }
 
-var (
+const (
 	MsgSystemError = "System Error. Please contact administrator."
+
+	QueryKeyEditMode = "edit"
 )

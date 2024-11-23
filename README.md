@@ -16,15 +16,13 @@ urlshortener --port 8080 --save.dir /var/lib/urlshortener/
 
 <img src=".docs/assets/register_form.png" width="360px">
 
-#### Replace shortened URL with query `?replace=true`
+#### Replace shortened URL with query `?edit`
 
-- [http://localhost:8080/path/to/shortened?replace=1](http://localhost:8080/path/to/shortened?replace=1)
-- [http://localhost:8080/path/to/shortened?replace=true](http://localhost:8080/path/to/shortened?replace=true)
+- [http://localhost:8080/path/to/shortened?edit](http://localhost:8080/path/to/shortened?edit)
 
-#### Show shortened URL list with query `?list=true`
+#### Show shortened URL list with query `?edit`
 
-- [http://localhost:8080/?list=1](http://localhost:8080/?list=1)
-- [http://localhost:8080/?list=true](http://localhost:8080/?list=true)
+- [http://localhost:8080/?edit](http://localhost:8080/?edit)
 
 It will display list of shortened URLs have prefix matched to path.
 

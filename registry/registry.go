@@ -18,8 +18,8 @@ type registry struct {
 	persistentDataFilePath string
 }
 
-// Append implements Registry.
-func (r *registry) Append(path string, redirectTarget string) error {
+// Save implements Registry.
+func (r *registry) Save(path string, redirectTarget string) error {
 	r.data[path] = redirectTarget
 	return nil
 }
