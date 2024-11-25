@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"path"
 	"strings"
@@ -100,7 +101,11 @@ func (r *registry) loadToCache() error {
 	for i := 0; scanner.Scan(); i++ {
 		line := strings.Split(scanner.Text(), ",")
 		if len(line) < 2 {
-			return fmt.Errorf("invaid data (%s:%d)", r.persistentDataFilePath, i)
+			slog.Warn(fmt.Sprintf("invalid data (%s:%d)", r.persistentDataFilePath, i+1))
+			continue
+		}
+		if !strings.HasPrefix(line[0], "/") {
+			return fmt.Errorf("%w (%s:%d)", ErrInvalidShortURL, r.persistentDataFilePath, i+1)
 		}
 		r.data[line[0]] = line[1]
 	}

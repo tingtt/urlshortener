@@ -14,6 +14,6 @@ type Registry interface {
 }
 
 var (
-	ErrURLNotEnough           = errors.New("url not enough")
+	ErrInvalidShortURL        = errors.New("shortened URL needs to start with \"/\"")
 	ErrRedirectTargetNotFound = errors.New("redirect target not found")
 )

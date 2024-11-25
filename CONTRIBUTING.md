@@ -27,8 +27,6 @@ docker build .
 
 ## Testing
 
-### Test code
-
 ```sh
 make test
 # will run `go test ./... -parallel 10`

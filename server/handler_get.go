@@ -12,17 +12,6 @@ import (
 )
 
 func (handler *handler) HandleGet(w http.ResponseWriter, r *http.Request) {
-	shortURLs, err := handler.deps.Usecase.FindAll()
-	if err != nil {
-		slog.Error(
-			fmt.Sprintf("POST \"%s\"", r.URL.Path),
-			slog.Int("status", http.StatusInternalServerError),
-			slog.String("error", "failed to find redirect target: "+err.Error()),
-		)
-		http.Error(w, MsgSystemError, http.StatusInternalServerError)
-		return
-	}
-
 	redirectTargetURL, err := handler.deps.Usecase.Find(r.URL.Path)
 	if err != nil && !errors.Is(err, usecase.ErrShortenedURLNotExists) {
 		slog.Error(
@@ -35,6 +24,17 @@ func (handler *handler) HandleGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if isEditMode(r.URL.Query()) {
+		shortURLs, err := handler.deps.Usecase.FindAll()
+		if err != nil {
+			slog.Error(
+				fmt.Sprintf("POST \"%s\"", r.URL.Path),
+				slog.Int("status", http.StatusInternalServerError),
+				slog.String("error", "failed to find redirect target: "+err.Error()),
+			)
+			http.Error(w, MsgSystemError, http.StatusInternalServerError)
+			return
+		}
+
 		html := handler.deps.UI.EditPage(
 			r.URL.Path,
 			redirectTargetURL,
@@ -60,6 +60,17 @@ func (handler *handler) HandleGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if /* shortened URL not found */ errors.Is(err, usecase.ErrShortenedURLNotExists) {
+		shortURLs, err := handler.deps.Usecase.FindAll()
+		if err != nil {
+			slog.Error(
+				fmt.Sprintf("POST \"%s\"", r.URL.Path),
+				slog.Int("status", http.StatusInternalServerError),
+				slog.String("error", "failed to find redirect target: "+err.Error()),
+			)
+			http.Error(w, MsgSystemError, http.StatusInternalServerError)
+			return
+		}
+
 		html := handler.deps.UI.RegisterPage(
 			r.URL.Path,
 			filterShortURLsByPrefix(shortURLs, path.Dir(r.URL.Path)),

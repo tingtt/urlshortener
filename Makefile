@@ -17,9 +17,13 @@ setup:
 staticcheck:
 	.tools/staticcheck/staticcheck ./...
 
+.PHONY: fmt
+fmt:
+	go fmt ./...
+
 .PHONY: test
 PARALLELS ?= 10
-test: staticcheck
+test: fmt staticcheck
 	$(GO) test ./... -parallel $(PARALLELS) -coverprofile=cover.out
 	$(GO) tool cover -html=cover.out -o cover.html
 
