@@ -17,7 +17,7 @@ import (
 type HandlerGetTest struct {
 	caseName        string
 	in              HandlerGetTestIn
-	usecaseBehavior UsecaseBehavior
+	usecaseBehavior HandlerGetTestUsecaseBehavior
 	uiExpectCall    UIExpectCall
 	uiRenderError   error
 	out             HandlerGetTestOut
@@ -32,7 +32,7 @@ type HandlerGetTestOut struct {
 	location string
 }
 
-type UsecaseBehavior struct {
+type HandlerGetTestUsecaseBehavior struct {
 	find    *UsecaseBehaviorFind
 	findAll *UsecaseBehaviorFindAll
 }
@@ -67,7 +67,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "redirect",
 		in:       HandlerGetTestIn{"https://urlshortener.example/exists"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"https://example.test/foundredirecttarget", nil},
 		},
 		out: HandlerGetTestOut{http.StatusFound, "https://example.test/foundredirecttarget"},
@@ -75,7 +75,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "open register page with short url list that filtered with prefix matching, if short url does not exist",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/none"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"", usecase.ErrShortenedURLNotExists},
 			findAll: &UsecaseBehaviorFindAll{
 				[]usecase.ShortURL{
@@ -127,7 +127,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle render error/register page",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/none"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find:    &UsecaseBehaviorFind{"", usecase.ErrShortenedURLNotExists},
 			findAll: &UsecaseBehaviorFindAll{[]usecase.ShortURL{}, nil},
 		},
@@ -140,7 +140,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle render error/edit page",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/exists?edit"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"https://example.test/foundredirecttarget", nil},
 			findAll: &UsecaseBehaviorFindAll{
 				[]usecase.ShortURL{
@@ -169,7 +169,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "open edit page with short url list that filtered with prefix matching, if contains \"edit\" query key",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/exists?edit"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"https://example.test/foundredirecttarget", nil},
 			findAll: &UsecaseBehaviorFindAll{
 				[]usecase.ShortURL{
@@ -221,7 +221,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle internal error",
 		in:       HandlerGetTestIn{"https://urlshortener.example/exists"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"", usecase.ErrInternal},
 		},
 		out: HandlerGetTestOut{http.StatusInternalServerError, ""},
@@ -229,7 +229,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle internal error",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/none"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find:    &UsecaseBehaviorFind{"", usecase.ErrShortenedURLNotExists},
 			findAll: &UsecaseBehaviorFindAll{nil, usecase.ErrInternal},
 		},
@@ -238,7 +238,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle internal error",
 		in:       HandlerGetTestIn{"https://urlshortener.example/exists?edit"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find:    &UsecaseBehaviorFind{"https://example.test/foundredirecttarget", nil},
 			findAll: &UsecaseBehaviorFindAll{nil, usecase.ErrInternal},
 		},
@@ -247,7 +247,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle unexpected error",
 		in:       HandlerGetTestIn{"https://urlshortener.example/exists"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"", errors.New("unexpected error")},
 		},
 		out: HandlerGetTestOut{http.StatusInternalServerError, ""},
@@ -255,7 +255,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle unexpected error",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/none"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find:    &UsecaseBehaviorFind{"", usecase.ErrShortenedURLNotExists},
 			findAll: &UsecaseBehaviorFindAll{nil, errors.New("unexpected error")},
 		},
@@ -264,7 +264,7 @@ var handlergettests = []HandlerGetTest{
 	{
 		caseName: "handle unexpected error",
 		in:       HandlerGetTestIn{"https://urlshortener.example/exists?edit"},
-		usecaseBehavior: UsecaseBehavior{
+		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find:    &UsecaseBehaviorFind{"https://example.test/foundredirecttarget", nil},
 			findAll: &UsecaseBehaviorFindAll{nil, errors.New("unexpected error")},
 		},
@@ -340,9 +340,9 @@ func Test_handler_HandleGet(t *testing.T) {
 			h := handler{Dependencies{usecase, ui}}
 			h.HandleGet(rw, req)
 
-			assert.Equal(t, rw.Code, tt.out.status)
+			assert.Equal(t, tt.out.status, rw.Code)
 			if tt.out.location != "" {
-				assert.Equal(t, rw.Header().Get("Location"), tt.out.location)
+				assert.Equal(t, tt.out.location, rw.Header().Get("Location"))
 			}
 		})
 	}
