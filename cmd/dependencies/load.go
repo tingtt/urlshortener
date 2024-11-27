@@ -16,7 +16,7 @@ func Load(persistentDataDirPath string, shutdownCtx context.Context, wg *sync.Wa
 		return server.Dependencies{}, err
 	}
 
-	registry, err := registry.New(persistentDataDirPath, shutdownCtx, wg)
+	registry, err := registry.Init(persistentDataDirPath, shutdownCtx, wg)
 	return server.Dependencies{
 		Usecase: usecase.New(usecase.Dependencies{Registry: registry}),
 		UI:      uiprovider.New(),

@@ -29,6 +29,9 @@ docker build .
 
 ```sh
 make test
+# will run `go test ./... -short -parallel 10`
+
+make testall
 # will run `go test ./... -parallel 10`
 ```
 

@@ -5,15 +5,28 @@ import (
 	"fmt"
 	"log/slog"
 	"path"
-	"sync"
 )
 
-func New(dataDir string, shutdownCtx context.Context, wg *sync.WaitGroup) (Registry, error) {
+type waitgroup interface {
+	Add(delta int)
+	Done()
+}
+
+func Init(dataDir string, shutdownCtx context.Context, wg waitgroup) (Registry, error) {
 	registry := &registry{persistentDataFilePath: path.Join(dataDir, "save.csv")}
 
-	err := registry.loadToCache()
+	err := standbyGraceful(registry, shutdownCtx, wg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load data: %w", err)
+		return nil, err
+	}
+
+	return registry, nil
+}
+
+func standbyGraceful(r fsregistry, shutdownCtx context.Context, wg waitgroup) error {
+	err := r.loadToCache()
+	if err != nil {
+		return fmt.Errorf("failed to load data: %w", err)
 	}
 
 	wg.Add(1)
@@ -22,7 +35,7 @@ func New(dataDir string, shutdownCtx context.Context, wg *sync.WaitGroup) (Regis
 		<-shutdownCtx.Done()
 
 		slog.Info("registry: Saving data...")
-		err := registry.SavePersistently()
+		err := r.savePersistently()
 		if err != nil {
 			slog.Error("failed to save data", slog.String("err", err.Error()))
 			return
@@ -30,5 +43,5 @@ func New(dataDir string, shutdownCtx context.Context, wg *sync.WaitGroup) (Regis
 		slog.Info("registry: Finish to save data")
 	}()
 
-	return registry, nil
+	return nil
 }

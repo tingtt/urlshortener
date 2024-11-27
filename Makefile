@@ -24,6 +24,12 @@ fmt:
 .PHONY: test
 PARALLELS ?= 10
 test: fmt staticcheck
+	$(GO) test ./... -short -parallel $(PARALLELS) -coverprofile=cover.out
+	$(GO) tool cover -html=cover.out -o cover.html
+
+.PHONY: testall
+PARALLELS ?= 10
+testall: fmt staticcheck
 	$(GO) test ./... -parallel $(PARALLELS) -coverprofile=cover.out
 	$(GO) tool cover -html=cover.out -o cover.html
 

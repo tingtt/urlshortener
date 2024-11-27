@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -278,6 +279,8 @@ func Test_handler_HandleGet(t *testing.T) {
 	for _, tt := range handlergettests {
 		t.Run(tt.caseName, func(t *testing.T) {
 			t.Parallel()
+
+			log.SetOutput(io.Discard)
 
 			req := httptest.NewRequest("GET", tt.in.reqURL, &bytes.Buffer{})
 

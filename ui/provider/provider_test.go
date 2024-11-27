@@ -9,7 +9,7 @@ import (
 func TestNew(t *testing.T) {
 	t.Parallel()
 
-	t.Run("will return non-nil struct with non-nil fields", func(t *testing.T) {
+	t.Run("return non-nil struct with non-nil fields", func(t *testing.T) {
 		t.Parallel()
 
 		provider := New().(*provider)

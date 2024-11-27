@@ -2,6 +2,8 @@ package server
 
 import (
 	"errors"
+	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -165,6 +167,8 @@ func Test_handler_HandlePost(t *testing.T) {
 		t.Run(tt.caseName, func(t *testing.T) {
 			t.Parallel()
 
+			log.SetOutput(io.Discard)
+
 			req := httptest.NewRequest("POST", tt.in.reqURL, strings.NewReader(tt.in.formData.Encode()))
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -207,6 +211,8 @@ func Test_handler_HandlePost(t *testing.T) {
 }
 
 func Test_editModeURL(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		path string
 	}
@@ -239,6 +245,8 @@ func Test_editModeURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := editModeURL(tt.args.path); got != tt.want {
 				t.Errorf("editModeURL() = %v, want %v", got, tt.want)
 			}

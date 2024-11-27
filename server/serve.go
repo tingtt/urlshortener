@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"sync"
 	"time"
 	uiprovider "urlshortener/ui/provider"
 	"urlshortener/usecase"
@@ -26,12 +25,31 @@ func (deps *Dependencies) validate() {
 	}
 }
 
-func Serve(port uint16, deps Dependencies, shutdownCtx context.Context, wg *sync.WaitGroup) error {
-	server := http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: newHandler(deps),
-	}
+type waitgroup interface {
+	Add(delta int)
+	Done()
+}
 
+func Serve(port uint16, deps Dependencies, shutdownCtx context.Context, wg waitgroup) error {
+	server := newServer(port, newRouter(newHandler(deps)))
+
+	slog.Info("http server started on " + server.Addr)
+	return gracefulServe(server, shutdownCtx, wg)
+}
+
+func newServer(port uint16, handler http.Handler) *http.Server {
+	return &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: handler,
+	}
+}
+
+type server interface {
+	ListenAndServe() error
+	Shutdown(ctx context.Context) error
+}
+
+func gracefulServe(server server, shutdownCtx context.Context, wg waitgroup) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -44,7 +62,6 @@ func Serve(port uint16, deps Dependencies, shutdownCtx context.Context, wg *sync
 		slog.Info("http: Server closed")
 	}()
 
-	slog.Info("http server started on " + server.Addr)
 	err := server.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
 		return err

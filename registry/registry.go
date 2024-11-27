@@ -12,6 +12,12 @@ import (
 )
 
 var _ Registry = &registry{}
+var _ fsregistry = &registry{}
+
+type fsregistry interface {
+	savePersistently() error
+	loadToCache() error
+}
 
 type registry struct {
 	data map[string]string
@@ -45,8 +51,8 @@ func (r *registry) Remove(path string) error {
 	return nil
 }
 
-// SavePersistently implements Registry.
-func (r *registry) SavePersistently() error {
+// savePersistently implements fsregistry.
+func (r *registry) savePersistently() error {
 	err := os.MkdirAll(path.Dir(r.persistentDataFilePath), 0755)
 	if err != nil {
 		return err
@@ -82,7 +88,7 @@ func (r *registry) SavePersistently() error {
 	return nil
 }
 
-// loadToCache implements Registry.
+// loadToCache implements fsregistry.
 func (r *registry) loadToCache() error {
 	file, err := os.Open(r.persistentDataFilePath)
 	if err != nil {
