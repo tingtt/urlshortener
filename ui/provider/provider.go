@@ -25,7 +25,7 @@ func (p *provider) EditPage(reqURL, redirectTargetURL string, shortURLs []usecas
 		gomponents.If(redirectTargetURL != "",
 			p.component.UpdateForm(),
 		),
-		p.component.ShortURLList(shortURLs),
+		p.component.ShortURLList(shortURLs, reqURL),
 	)
 }
 

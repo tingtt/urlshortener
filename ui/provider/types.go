@@ -25,5 +25,5 @@ type componentI interface {
 	PathInfo(reqPath, redirectTargetURL string) gomponents.Node
 	RegisterForm() gomponents.Node
 	UpdateForm() gomponents.Node
-	ShortURLList(shortURLs []usecase.ShortURL) gomponents.Node
+	ShortURLList(shortURLs []usecase.ShortURL, selectedShortURLs ...string) gomponents.Node
 }

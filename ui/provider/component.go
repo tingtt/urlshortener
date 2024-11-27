@@ -1,6 +1,7 @@
 package uiprovider
 
 import (
+	"slices"
 	"urlshortener/usecase"
 
 	"maragu.dev/gomponents"
@@ -87,7 +88,7 @@ func (c *component) UpdateForm() gomponents.Node {
 }
 
 // ShortURLList implements componentI.
-func (c *component) ShortURLList(shortURLs []usecase.ShortURL) gomponents.Node {
+func (c *component) ShortURLList(shortURLs []usecase.ShortURL, selectedShortURLs ...string) gomponents.Node {
 	if len(shortURLs) == 0 {
 		return gomponents.Group{
 			html.H2(gomponents.Text("Redirects")),
@@ -119,6 +120,7 @@ func (c *component) ShortURLList(shortURLs []usecase.ShortURL) gomponents.Node {
 									gomponents.Attr("type", "checkbox"),
 									gomponents.Attr("name", PostFromKeyDeleteShortenedURLs),
 									gomponents.Attr("value", shortURL.From),
+									gomponents.If(slices.Contains(selectedShortURLs, shortURL.From), html.Checked()),
 								),
 							),
 							html.Td(
