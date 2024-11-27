@@ -7,7 +7,7 @@ Create a `compose.yaml` file to define the service.
 ```yaml
 services:
   urlshortener:
-    image: tingtt/urlshortener:v1.0.0
+    image: tingtt/urlshortener:v2.0.0
     command: [
       "--port", "8080",
       "--save.dir", "/var/lib/urlshortener/",
