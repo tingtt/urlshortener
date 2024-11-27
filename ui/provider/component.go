@@ -100,7 +100,7 @@ func (c *component) ShortURLList(shortURLs []usecase.ShortURL) gomponents.Node {
 		html.Form(
 			gomponents.Attr("method", "POST"),
 			html.Button(
-				gomponents.Attr("type", "submit"),
+				gomponents.Attr("type", "submit"), html.Style("color:red;"),
 				gomponents.Text("Delete selected"),
 			),
 			html.Table(
