@@ -11,12 +11,16 @@ func New() Provider {
 }
 
 type provider struct {
-	layout    layoutI
-	component componentI
+	layout    *layout
+	component *component
 }
 
 // EditPage implements Provider.
 func (p *provider) EditPage(reqURL, redirectTargetURL string, shortURLs []usecase.ShortURL) gomponents.Node {
+	for i := range len(shortURLs) {
+		shortURLs[i].From += "?edit"
+	}
+
 	return p.layout.Base(
 		p.component.PathInfo(reqURL, redirectTargetURL),
 		gomponents.If(redirectTargetURL == "",

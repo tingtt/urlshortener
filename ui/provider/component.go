@@ -2,6 +2,7 @@ package uiprovider
 
 import (
 	"slices"
+	"strings"
 	"urlshortener/usecase"
 
 	"maragu.dev/gomponents"
@@ -127,7 +128,7 @@ func (c *component) ShortURLList(shortURLs []usecase.ShortURL, selectedShortURLs
 								html.A(
 									gomponents.Attr("href", shortURL.From),
 									html.Class("pr"),
-									gomponents.Text(shortURL.From),
+									gomponents.Text(strings.Split(shortURL.From, "?")[0]),
 								),
 							),
 							html.Td(
