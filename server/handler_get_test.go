@@ -66,7 +66,7 @@ type UIExpectCallEditPage struct {
 
 var handlergettests = []HandlerGetTest{
 	{
-		caseName: "redirect",
+		caseName: "redirect to found target URL",
 		in:       HandlerGetTestIn{"https://urlshortener.example/exists"},
 		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"https://example.test/foundredirecttarget", nil},
@@ -74,7 +74,7 @@ var handlergettests = []HandlerGetTest{
 		out: HandlerGetTestOut{http.StatusFound, "https://example.test/foundredirecttarget"},
 	},
 	{
-		caseName: "open register page with short url list that filtered with prefix matching, if short url does not exist",
+		caseName: "open register page with short URL list that filtered with prefix matching, if short url does not exist",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/none"},
 		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"", usecase.ErrShortenedURLNotExists},
@@ -168,7 +168,7 @@ var handlergettests = []HandlerGetTest{
 		out:           HandlerGetTestOut{http.StatusInternalServerError, ""},
 	},
 	{
-		caseName: "open edit page with short url list that filtered with prefix matching, if contains \"edit\" query key",
+		caseName: "open edit page with short URL list that filtered with prefix matching, if contains \"edit\" query key",
 		in:       HandlerGetTestIn{"https://urlshortener.example/test/exists?edit"},
 		usecaseBehavior: HandlerGetTestUsecaseBehavior{
 			find: &UsecaseBehaviorFind{"https://example.test/foundredirecttarget", nil},
