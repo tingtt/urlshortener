@@ -282,70 +282,59 @@ func Test_handler_HandleGet(t *testing.T) {
 
 			log.SetOutput(io.Discard)
 
-			req := httptest.NewRequest("GET", tt.in.reqURL, &bytes.Buffer{})
-
 			usecase := new(MockUsecase)
 			if tt.usecaseBehavior.find != nil {
 				usecase.On("Find", mock.Anything).Return(tt.usecaseBehavior.find.redirectTarget, tt.usecaseBehavior.find.err)
-				defer func() {
-					usecase.AssertCalled(t, "Find", req.URL.Path)
-				}()
 			}
 			if tt.usecaseBehavior.findAll != nil {
 				usecase.On("FindAll").Return(tt.usecaseBehavior.findAll.shortURLs, tt.usecaseBehavior.findAll.err)
 			}
 
-			rw := httptest.NewRecorder()
-
 			ui := new(MockUI)
-
 			node := gomponents.Text(t.Name())
-
 			mockNode := new(MockNode)
 			mockNode.On("Render", mock.Anything).Run(func(args mock.Arguments) {
 				if tt.uiRenderError == nil {
 					node.Render(args.Get(0).(io.Writer))
 				}
 			}).Return(tt.uiRenderError)
-
 			ui.On("RegisterPage", mock.Anything, mock.Anything).Return(mockNode)
-			if tt.uiExpectCall.registerPage != nil {
-				defer func() {
-					ui.AssertCalled(t, "RegisterPage",
-						tt.uiExpectCall.registerPage.reqPath,
-						tt.uiExpectCall.registerPage.shortURLs,
-					)
-
-					if tt.uiRenderError == nil {
-						buf := &bytes.Buffer{}
-						node.Render(buf)
-						assert.Equal(t, rw.Body.String(), buf.String())
-					}
-				}()
-			}
 			ui.On("EditPage", mock.Anything, mock.Anything, mock.Anything).Return(mockNode)
-			if tt.uiExpectCall.editPage != nil {
-				defer func() {
-					ui.AssertCalled(t, "EditPage",
-						tt.uiExpectCall.editPage.reqPath,
-						tt.uiExpectCall.editPage.redirectTargetURL,
-						tt.uiExpectCall.editPage.shortURLs,
-					)
-
-					if tt.uiRenderError == nil {
-						buf := &bytes.Buffer{}
-						node.Render(buf)
-						assert.Equal(t, rw.Body.String(), buf.String())
-					}
-				}()
-			}
 
 			h := handler{Dependencies{usecase, ui}}
+			req := httptest.NewRequest("GET", tt.in.reqURL, &bytes.Buffer{})
+			rw := httptest.NewRecorder()
 			h.HandleGet(rw, req)
 
 			assert.Equal(t, tt.out.status, rw.Code)
 			if tt.out.location != "" {
 				assert.Equal(t, tt.out.location, rw.Header().Get("Location"))
+			}
+			if tt.usecaseBehavior.find != nil {
+				usecase.AssertCalled(t, "Find", req.URL.Path)
+			}
+			if tt.uiExpectCall.registerPage != nil {
+				ui.AssertCalled(t, "RegisterPage",
+					tt.uiExpectCall.registerPage.reqPath,
+					tt.uiExpectCall.registerPage.shortURLs,
+				)
+				if tt.uiRenderError == nil {
+					buf := &bytes.Buffer{}
+					node.Render(buf)
+					assert.Equal(t, buf.String(), rw.Body.String())
+				}
+			}
+			if tt.uiExpectCall.editPage != nil {
+				ui.AssertCalled(t, "EditPage",
+					tt.uiExpectCall.editPage.reqPath,
+					tt.uiExpectCall.editPage.redirectTargetURL,
+					tt.uiExpectCall.editPage.shortURLs,
+				)
+				if tt.uiRenderError == nil {
+					buf := &bytes.Buffer{}
+					node.Render(buf)
+					assert.Equal(t, buf.String(), rw.Body.String())
+				}
 			}
 		})
 	}

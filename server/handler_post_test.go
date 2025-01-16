@@ -169,42 +169,40 @@ func Test_handler_HandlePost(t *testing.T) {
 
 			log.SetOutput(io.Discard)
 
-			req := httptest.NewRequest("POST", tt.in.reqURL, strings.NewReader(tt.in.formData.Encode()))
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
 			usecase := new(MockUsecase)
 			if tt.usecaseBehavior.find != nil {
 				usecase.On("Find", mock.Anything).Return(tt.usecaseBehavior.find.redirectTarget, tt.usecaseBehavior.find.err)
-				defer func() {
-					usecase.AssertCalled(t, "Find", req.URL.Path)
-				}()
 			}
 			if tt.usecaseBehavior.findAll != nil {
 				usecase.On("FindAll").Return(tt.usecaseBehavior.findAll.shortURLs, tt.usecaseBehavior.findAll.err)
 			}
 			if tt.usecaseBehavior.save != nil {
 				usecase.On("Save", mock.Anything, mock.Anything).Return(tt.usecaseBehavior.save.err)
-				defer func() {
-					targetURL := tt.in.formData.Get(uiprovider.PostFormKeyRegisterShortenedURLTarget)
-					usecase.AssertCalled(t, "Save", req.URL.Path, targetURL)
-				}()
 			}
 			if tt.usecaseBehavior.delete != nil {
 				usecase.On("Delete", mock.Anything).Return(tt.usecaseBehavior.delete.err)
-				defer func() {
-					deleteShortenedURLs := tt.in.formData[uiprovider.PostFromKeyDeleteShortenedURLs]
-					usecase.AssertCalled(t, "Delete", deleteShortenedURLs)
-				}()
 			}
 
-			rw := httptest.NewRecorder()
-
 			h := handler{Dependencies{usecase, new(MockUI)}}
+			req := httptest.NewRequest("POST", tt.in.reqURL, strings.NewReader(tt.in.formData.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			rw := httptest.NewRecorder()
 			h.HandlePost(rw, req)
 
 			assert.Equal(t, tt.out.status, rw.Code)
 			if tt.out.location != "" {
 				assert.Equal(t, tt.out.location, rw.Header().Get("Location"))
+			}
+			if tt.usecaseBehavior.find != nil {
+				usecase.AssertCalled(t, "Find", req.URL.Path)
+			}
+			if tt.usecaseBehavior.save != nil {
+				targetURL := tt.in.formData.Get(uiprovider.PostFormKeyRegisterShortenedURLTarget)
+				usecase.AssertCalled(t, "Save", req.URL.Path, targetURL)
+			}
+			if tt.usecaseBehavior.delete != nil {
+				deleteShortenedURLs := tt.in.formData[uiprovider.PostFromKeyDeleteShortenedURLs]
+				usecase.AssertCalled(t, "Delete", deleteShortenedURLs)
 			}
 		})
 	}
